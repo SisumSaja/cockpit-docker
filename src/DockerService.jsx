@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {Terminal} from "./Terminal";
+import React, { useEffect, useState } from 'react';
+import { Terminal } from './Terminal';
 
 const DockerService = () => {
     const [status, setStatus] = useState('');
@@ -10,11 +10,12 @@ const DockerService = () => {
         NFd: '?',
         Containers: '?',
         Images: '?',
-    })
+    });
 
     const addToLogs = (message, type = 'info') => {
-        setLogs((prevLogs) => [...prevLogs, {message, type}]);
+        setLogs((prevLogs) => [...prevLogs, { message, type }]);
     };
+
     const installDocker = async () => {
         addToLogs('Installing Docker...', 'info');
         try {
@@ -37,6 +38,7 @@ const DockerService = () => {
             addToLogs('An error occurred.', 'error');
         }
     };
+
     const buildDocker = () => {
         setStatus('Building Docker Image...');
         // Simulate the build process (replace with actual build commands)
@@ -44,6 +46,7 @@ const DockerService = () => {
             setStatus('Docker Image built successfully!');
         }, 3000);
     };
+
     const dockerCompose = () => {
         setStatus('Running Docker Compose...');
         // Simulate the docker-compose process (replace with actual compose commands)
@@ -52,10 +55,9 @@ const DockerService = () => {
         }, 3000);
     };
 
-
     async function retrieveInfo() {
         try {
-            const response = await fetch('/var/run/docker.sock/info', {method: 'GET'})
+            const response = await fetch('/var/run/docker.sock/info', { method: 'GET' });
             const data = await response.json();
             setDockerInfo(data);
         } catch (error) {
@@ -79,24 +81,26 @@ const DockerService = () => {
         };
     }, []);
 
-    return (<div>
-        <h1>Docker Plugin Interface (React)</h1>
-        <div id="status">{status}</div>
-        <button onClick={installDocker}>Install Docker</button>
-        <button onClick={buildDocker}>Build Docker Image</button>
-        <button onClick={dockerCompose}>Docker Compose</button>
-        <Terminal logs={logs}/>
-        <div className="container-fluid">
-            <h2>Docker Daemon Info</h2>
-            <ul>
-                <li>Total Memory: <span>{dockerInfo.MemTotal}</span></li>
-                <li>Go Routines: <span>{dockerInfo.NGoroutines}</span></li>
-                <li>File Descriptors: <span>{dockerInfo.NFd}</span></li>
-                <li>Containers: <span>{dockerInfo.Containers}</span></li>
-                <li>Images: <span>{dockerInfo.Images}</span></li>
-            </ul>
+    return (
+        <div>
+            <h1>Docker Plugin Interface (React)</h1>
+            <div id="status">{status}</div>
+            <button onClick={installDocker}>Install Docker</button>
+            <button onClick={buildDocker}>Build Docker Image</button>
+            <button onClick={dockerCompose}>Docker Compose</button>
+            <Terminal logs={logs} />
+            <div className="container-fluid">
+                <h2>Docker Daemon Info</h2>
+                <ul>
+                    <li>Total Memory: <span>{dockerInfo.memTotal}</span></li>
+                    <li>Go Routines: <span>{dockerInfo.NGoroutines}</span></li>
+                    <li>File Descriptors: <span>{dockerInfo.NFd}</span></li>
+                    <li>Containers: <span>{dockerInfo.Containers}</span></li>
+                    <li>Images: <span>{dockerInfo.Images}</span></li>
+                </ul>
+            </div>
         </div>
-    </div>)
-
+    );
 };
+
 export default DockerService;
