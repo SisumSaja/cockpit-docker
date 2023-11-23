@@ -1,5 +1,5 @@
-import React, {useState} from "react";
 import cockpit from 'cockpit'
+import React, {useState} from "react";
 
 export function Terminal({logs}){
 

@@ -7,13 +7,11 @@
   "author": "",
   "license": "LGPL-2.1",
   "engines": {
-    "node": ">= 16"
+    "node": ">= 20"
   },
   "scripts": {
     "watch": "ESBUILD_WATCH='true' ./build.js",
     "build": "./build.js",
-    "eslint": "eslint --ext .js --ext .jsx src/",
-    "eslint:fix": "eslint --fix --ext .js --ext .jsx src/",
     "stylelint": "stylelint src/*{.css,scss}",
     "stylelint:fix": "stylelint --fix src/*{.css,scss}"
   },
@@ -25,11 +23,6 @@
     "esbuild-plugin-replace": "1.4.0",
     "esbuild-sass-plugin": "2.16.0",
     "esbuild-wasm": "0.19.7",
-    "eslint-config-standard": "17.1.0",
-    "eslint-config-standard-jsx": "11.0.0",
-    "eslint-config-standard-react": "13.0.0",
-    "eslint-plugin-node": "11.1.0",
-    "eslint-plugin-promise": "6.1.1",
     "gettext-parser": "7.0.1",
     "htmlparser": "1.7.7",
     "jed": "1.1.1",
