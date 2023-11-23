@@ -1,4 +1,6 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
+import './style/DockerService.css'
+import cockpit from 'cockpit'
 
 const DockerService = () => {
     const [status, setStatus] = useState('');
@@ -12,23 +14,21 @@ const DockerService = () => {
 
     const buildDocker = () => {
         setStatus('Building Docker Image...');
-        // Simulate the build process (replace with actual build commands)
-        setTimeout(() => {
+        cockpit.spawn(['your_build_command']).done((data) => {
             setStatus('Docker Image built successfully!');
-        }, 3000);
+        });
     };
 
     const dockerCompose = () => {
         setStatus('Running Docker Compose...');
-        // Simulate the docker-compose process (replace with actual compose commands)
-        setTimeout(() => {
+        cockpit.spawn(['your_docker_compose_command']).done((data) => {
             setStatus('Docker Compose completed successfully!');
-        }, 3000);
+        });
     };
 
     async function retrieveInfo() {
         try {
-            const response = await fetch('/var/run/docker.sock/info', {method: 'GET'});
+            const response = await fetch('/var/run/docker.sock/info', { method: 'GET' });
             const data = await response.json();
             setDockerInfo(data);
         } catch (error) {
@@ -41,14 +41,14 @@ const DockerService = () => {
         retrieveInfo();
 
         // Event listener for updates
-        const eventSource = new EventSource('/var/run/docker.sock/events');
-        eventSource.addEventListener('message', () => {
+        const dockerEvents = new EventSource('/var/run/docker.sock/events');
+        dockerEvents.addEventListener('message', () => {
             retrieveInfo();
         });
 
         // Cleanup on unmount
         return () => {
-            eventSource.close();
+            dockerEvents.close();
         };
     }, []);
 
