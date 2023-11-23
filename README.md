@@ -8,7 +8,7 @@ Scaffolding for a [Cockpit](https://cockpit-project.org/) module.
 These commands check out the source and build it into the `dist/` directory:
 
 ```
-git clone https://git@github.com:SisumSaja/cockpit-docker.git
+git clone git@github.com:SisumSaja/cockpit-docker.git
 cd cockpit-docker
 make
 ```
