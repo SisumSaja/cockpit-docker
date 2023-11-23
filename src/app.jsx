@@ -20,7 +20,7 @@ export class Application extends React.Component {
     render() {
         return (
             <Card>
-                <CardTitle>Starter Kit</CardTitle>
+                <CardTitle>Cockpit Test</CardTitle>
                 <CardBody>
                     <Alert
                         variant="info"
