@@ -87,7 +87,6 @@ const DockerService = () => {
             <button onClick={installDocker}>Install Docker</button>
             <button onClick={buildDocker}>Build Docker Image</button>
             <button onClick={dockerCompose}>Docker Compose</button>
-            <Terminal logs={logs} />
             <div className="container-fluid">
                 <h2>Docker Daemon Info</h2>
                 <ul>
