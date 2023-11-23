@@ -17,3 +17,5 @@ POTFILES*
 tmp/
 /po/LINGUAS
 /tools
+
+.idea
