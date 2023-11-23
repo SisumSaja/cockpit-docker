@@ -10,32 +10,6 @@ const DockerService = () => {
         Images: '?',
     });
 
-    const addToLogs = (message, type = 'info') => {
-        setLogs((prevLogs) => [...prevLogs, { message, type }]);
-    };
-
-    const installDocker = async () => {
-        addToLogs('Installing Docker...', 'info');
-        try {
-            const response = await fetch('http://localhost:5000/install-docker', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                addToLogs(data.message, 'success');
-            } else {
-                addToLogs(`Error: ${data.error}`, 'error');
-            }
-        } catch (error) {
-            console.error('Error:', error.message);
-            addToLogs('An error occurred.', 'error');
-        }
-    };
 
     const buildDocker = () => {
         setStatus('Building Docker Image...');
@@ -83,7 +57,6 @@ const DockerService = () => {
         <div>
             <h1>Docker Plugin Interface (React)</h1>
             <div id="status">{status}</div>
-            <button onClick={installDocker}>Install Docker</button>
             <button onClick={buildDocker}>Build Docker Image</button>
             <button onClick={dockerCompose}>Docker Compose</button>
             <div className="container-fluid">
