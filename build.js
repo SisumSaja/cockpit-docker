@@ -11,7 +11,6 @@ import { cockpitCompressPlugin } from './pkg/lib/esbuild-compress-plugin.js';
 import { cockpitPoEsbuildPlugin } from './pkg/lib/cockpit-po-plugin.js';
 import { cockpitRsyncEsbuildPlugin } from './pkg/lib/cockpit-rsync-plugin.js';
 import { esbuildStylesPlugins } from './pkg/lib/esbuild-common.js';
-import { eslintPlugin } from './pkg/lib/esbuild-eslint-plugin.js';
 import { stylelintPlugin } from './pkg/lib/esbuild-stylelint-plugin.js';
 
 const production = process.env.NODE_ENV === 'production';
@@ -96,7 +95,6 @@ const context = await esbuild.context({
     plugins: [
         cleanPlugin(),
         ...args.no_stylelint ? [] : [stylelintPlugin({ filter: new RegExp(cwd + '\/src\/.*\.(css?|scss?)$') })],
-        ...args.no_eslint ? [] : [eslintPlugin({ filter: new RegExp(cwd + '\/src\/.*\.(jsx?|js?)$') })],
         // Esbuild will only copy assets that are explicitly imported and used
         // in the code. This is a problem for index.html and manifest.json which are not imported
         copy({
