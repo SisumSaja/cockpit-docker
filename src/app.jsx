@@ -24,6 +24,7 @@ export class Application extends React.Component {
                 <CardBody>
                     <Alert
                         variant="info"
+                        title={ cockpit.format(_("Running on $0"), this.state.hostname) }
                     />
                     <DockerService />
                 </CardBody>
