@@ -153,30 +153,6 @@ rpm: $(TARFILE) $(NODE_CACHE) $(SPEC)
 	rm -r "`pwd`/rpmbuild"
 	rm -r "`pwd`/output" "`pwd`/build"
 
-# build a VM with locally built distro pkgs installed
-# disable networking, VM images have mock/pbuilder with the common build dependencies pre-installed
-$(VM_IMAGE): $(TARFILE) $(NODE_CACHE) bots test/vm.install
-	bots/image-customize --no-network --fresh \
-		--upload $(NODE_CACHE):/var/tmp/ --build $(TARFILE) \
-		--script $(CURDIR)/test/vm.install $(TEST_OS)
-
-# convenience target for the above
-vm: $(VM_IMAGE)
-	@echo $(VM_IMAGE)
-
-# convenience target to print the filename of the test image
-print-vm:
-	@echo $(VM_IMAGE)
-
-# convenience target to setup all the bits needed for the integration tests
-# without actually running them
-prepare-check: $(NODE_MODULES_TEST) $(VM_IMAGE) test/common
-
-# run the browser integration tests
-# this will run all tests/check-* and format them as TAP
-#check: prepare-check
-#	test/common/run-tests ${RUN_TESTS_OPTIONS}
-
 # checkout Cockpit's bots for standard test VM images and API to launch them
 bots: $(COCKPIT_REPO_STAMP)
 	test/common/make-bots
