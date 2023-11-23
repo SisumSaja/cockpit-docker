@@ -31,7 +31,7 @@ COCKPIT_REPO_FILES = \
 	test/common \
 	$(NULL)
 
-COCKPIT_REPO_URL = git@github.com:SisumSaja/cockpit-docker.git
+COCKPIT_REPO_URL = https://github.com/cockpit-project/cockpit.git
 COCKPIT_REPO_COMMIT = 9da922928c1b1ea8489e12ba5ba6ecfdbe0f5bf3 # 305 + 8 commits
 
 $(COCKPIT_REPO_FILES): $(COCKPIT_REPO_STAMP)
