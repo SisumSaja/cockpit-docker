@@ -1,9 +1,8 @@
-import cockpit from 'cockpit';
 import React from 'react';
 import { Alert } from "@patternfly/react-core/dist/esm/components/Alert/index.js";
 import { Card, CardBody, CardTitle } from "@patternfly/react-core/dist/esm/components/Card/index.js";
-import DockerService from "./DockerService.jsx";
-
+import cockpit from 'cockpit';
+import {Terminal} from "./terminal/Terminal.jsx";
 
 const _ = cockpit.gettext;
 
@@ -26,8 +25,8 @@ export class Application extends React.Component {
                         variant="info"
                         title={ cockpit.format(_("Running on $0"), this.state.hostname) }
                     />
-                    <DockerService />
                 </CardBody>
+                <Terminal />
             </Card>
         );
     }

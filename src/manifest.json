@@ -5,7 +5,8 @@
 
     "tools": {
         "index": {
-            "label": "Cockpit Test"
+            "label": "Cockpit Test",
+            "path": "index.html"
         }
     }
 }

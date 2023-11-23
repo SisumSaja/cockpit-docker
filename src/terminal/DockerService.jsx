@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './style/DockerService.css';
+import '../style/DockerService.css';
 import cockpit from "cockpit";
 
 const DockerService = () => {
