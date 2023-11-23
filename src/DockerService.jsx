@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 
 const DockerService = () => {
     const [status, setStatus] = useState('');
-    const [logs, setLogs] = useState([]);
     const [dockerInfo, setDockerInfo] = useState({
         memTotal: '?',
         NGoroutines: '?',
