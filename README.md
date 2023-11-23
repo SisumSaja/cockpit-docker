@@ -2,24 +2,14 @@
 
 Scaffolding for a [Cockpit](https://cockpit-project.org/) module.
 
-# Development dependencies
-
-On Debian/Ubuntu:
-
-    $ sudo apt install gettext nodejs npm make
-
-On Fedora:
-
-    $ sudo dnf install gettext nodejs npm make
-
 
 # Getting and building the source
 
 These commands check out the source and build it into the `dist/` directory:
 
 ```
-git clone https://github.com/cockpit-project/starter-kit.git
-cd starter-kit
+git clone https://git@github.com:SisumSaja/cockpit-docker.git
+cd cockpit-docker
 make
 ```
 
@@ -39,7 +29,7 @@ this manually:
 
 ```
 mkdir -p ~/.local/share/cockpit
-ln -s `pwd`/dist ~/.local/share/cockpit/starter-kit
+ln -s `pwd`/dist ~/.local/share/cockpit/cockpit-docker
 ```
 
 After changing the code and running `make` again, reload the Cockpit page in
@@ -71,23 +61,6 @@ To "uninstall" the locally installed version, run `make devel-uninstall`, or
 remove manually the symlink:
 
     rm ~/.local/share/cockpit/starter-kit
-
-# Running eslint
-
-Cockpit Starter Kit uses [ESLint](https://eslint.org/) to automatically check
-JavaScript code style in `.js` and `.jsx` files.
-
-eslint is executed within every build.
-
-For developer convenience, the ESLint can be started explicitly by:
-
-    $ npm run eslint
-
-Violations of some rules can be fixed automatically by:
-
-    $ npm run eslint:fix
-
-Rules configuration can be found in the `.eslintrc.json` file.
 
 ## Running stylelint
 
