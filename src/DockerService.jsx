@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 
 const DockerService = () => {
     const [status, setStatus] = useState('');
@@ -9,7 +9,6 @@ const DockerService = () => {
         Containers: '?',
         Images: '?',
     });
-
 
     const buildDocker = () => {
         setStatus('Building Docker Image...');
@@ -29,7 +28,7 @@ const DockerService = () => {
 
     async function retrieveInfo() {
         try {
-            const response = await fetch('/var/run/docker.sock/info', { method: 'GET' });
+            const response = await fetch('/var/run/docker.sock/info', {method: 'GET'});
             const data = await response.json();
             setDockerInfo(data);
         } catch (error) {
