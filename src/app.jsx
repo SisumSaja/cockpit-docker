@@ -1,7 +1,6 @@
 import cockpit from 'cockpit';
 import React from 'react';
-import {Alert} from "@patternfly/react-core/dist/esm/components/Alert/index.js";
-import {Card, CardBody, CardTitle} from "@patternfly/react-core/dist/esm/components/Card/index.js";
+import {Card, CardTitle} from "@patternfly/react-core/dist/esm/components/Card/index.js";
 import DockerService from "./DockerService.jsx";
 
 
@@ -19,10 +18,8 @@ export class Application extends React.Component {
 
     render() {
         return (<Card>
-                <CardTitle>Starter Kit</CardTitle>
-                <CardBody>
+                <CardTitle>TEST</CardTitle>
                     <DockerService/>
-                </CardBody>
             </Card>);
     }
 }
