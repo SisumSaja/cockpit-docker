@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Terminal } from './Terminal';
 
 const DockerService = () => {
     const [status, setStatus] = useState('');
