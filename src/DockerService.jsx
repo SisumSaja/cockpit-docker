@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import './style/DockerService.css'
-import cockpit from 'cockpit'
+import './DockerService.css';
+import cockpit from "cockpit";
 
 const DockerService = () => {
     const [status, setStatus] = useState('');
@@ -53,12 +53,12 @@ const DockerService = () => {
     }, []);
 
     return (
-        <div>
+        <div className="docker-service-container">
             <h1>Docker Plugin Interface (React)</h1>
-            <div id="status">{status}</div>
-            <button onClick={buildDocker}>Build Docker Image</button>
-            <button onClick={dockerCompose}>Docker Compose</button>
-            <div className="container-fluid">
+            <div id="status" className="status">{status}</div>
+            <button className="docker-button" onClick={buildDocker}>Build Docker Image</button>
+            <button className="docker-button" onClick={dockerCompose}>Docker Compose</button>
+            <div className="docker-info-container">
                 <h2>Docker Daemon Info</h2>
                 <ul>
                     <li>Total Memory: <span>{dockerInfo.memTotal}</span></li>
