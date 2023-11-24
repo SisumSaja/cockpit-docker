@@ -39,10 +39,10 @@ export class Application extends React.Component {
             <Card>
                 <CardTitle>Starter Kit</CardTitle>
                 <CardBody>
-                    <Alert
-                        variant="info"
-                        title={ cockpit.format(_("Running on $0"), this.state.hostname) }
-                    />
+                    {/*<Alert*/}
+                    {/*    variant="info"*/}
+                    {/*    title={ cockpit.format(_("Running on $0"), this.state.hostname) }*/}
+                    {/*/>*/}
                 </CardBody>
             </Card>
         );

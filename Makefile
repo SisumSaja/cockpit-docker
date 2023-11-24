@@ -89,6 +89,7 @@ clean:
 	rm -rf dist/
 	rm -f $(SPEC)
 	rm -f po/LINGUAS
+	rm -f package-log.json
 
 install: $(DIST_TEST) po/LINGUAS
 	mkdir -p $(DESTDIR)$(PREFIX)/share/cockpit/$(PACKAGE_NAME)
@@ -106,6 +107,8 @@ devel-install: $(DIST_TEST)
 # assumes that there was symlink set up using the above devel-install target,
 # and removes it
 devel-uninstall:
+	rm -rf ./node_modules/ ./pkg
+	rm -rf ~/.local/share/cockpit
 	rm -f ~/.local/share/cockpit/$(PACKAGE_NAME)
 
 print-version:
