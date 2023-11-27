@@ -5,6 +5,7 @@ VERSION := $(shell T=$$(git describe 2>/dev/null) || T=1; echo $$T | tr '-' '.')
 ifeq ($(TEST_OS),)
 TEST_OS = fedora-39
 endif
+
 export TEST_OS
 TARFILE=$(RPM_NAME)-$(VERSION).tar.xz
 NODE_CACHE=$(RPM_NAME)-node-$(VERSION).tar.xz
@@ -36,6 +37,7 @@ all: $(DIST_TEST)
 COCKPIT_REPO_FILES = \
 	pkg/lib \
 	test/common \
+<<<<<<< HEAD
 	test/static-code \
 	tools/node-modules \
 	$(NULL)
@@ -121,8 +123,7 @@ devel-install: $(DIST_TEST)
 # and removes it
 devel-uninstall:
 	rm -rf ./node_modules/ ./pkg
-	rm -rf ~/.local/share/cockpit
-	rm -f ~/.local/share/cockpit/$(PACKAGE_NAME)
+	rm -rf ~/.local/share/cockpit/$(PACKAGE_NAME)
 
 print-version:
 	@echo "$(VERSION)"

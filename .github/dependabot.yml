@@ -6,7 +6,11 @@ updates:
       interval: "daily"
       # run these when most of our developers don't work, don't DoS our CI over the day
       time: "22:00"
+<<<<<<< HEAD
       timezone: "Europe/Berlin"
+=======
+      timezone: "Asia/Jakarta"
+>>>>>>> d4482e3e056682fea6a254759928b33857ee3f18
     open-pull-requests-limit: 3
     groups:
       eslint:

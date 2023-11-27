@@ -2,9 +2,7 @@
 
 import fs from 'node:fs';
 import os from 'node:os';
-
 import copy from 'esbuild-plugin-copy';
-
 import { cockpitCompressPlugin } from './pkg/lib/esbuild-compress-plugin.js';
 import { cockpitPoEsbuildPlugin } from './pkg/lib/cockpit-po-plugin.js';
 import { cockpitRsyncEsbuildPlugin } from './pkg/lib/cockpit-rsync-plugin.js';
@@ -35,7 +33,6 @@ const args = parser.parse_args();
 
 if (args.rsync)
     process.env.RSYNC = args.rsync;
-
 function notifyEndPlugin() {
     return {
         name: 'notify-end',
@@ -82,10 +79,8 @@ const context = await esbuild.context({
         }),
         ...esbuildStylesPlugins,
         cockpitPoEsbuildPlugin(),
-
         ...production ? [cockpitCompressPlugin()] : [],
         cockpitRsyncEsbuildPlugin({ dest: packageJson.name }),
-
         notifyEndPlugin(),
     ]
 });
@@ -110,6 +105,7 @@ if (args.watch) {
             await context.rebuild();
         } catch (e) {} // ignore in watch mode
     });
+
     // wait forever until Control-C
     await new Promise(() => {});
 }

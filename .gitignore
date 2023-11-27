@@ -17,6 +17,11 @@ POTFILES*
 tmp/
 /po/LINGUAS
 /tools
+<<<<<<< HEAD
 .idea
 idea
 Documentation
+=======
+
+.idea
+>>>>>>> d4482e3e056682fea6a254759928b33857ee3f18
