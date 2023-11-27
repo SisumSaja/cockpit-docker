@@ -3,7 +3,7 @@ PACKAGE_NAME := $(shell awk '/"name":/ {gsub(/[",]/, "", $$2); print $$2}' packa
 RPM_NAME := cockpit-$(PACKAGE_NAME)
 VERSION := $(shell T=$$(git describe 2>/dev/null) || T=1; echo $$T | tr '-' '.')
 ifeq ($(TEST_OS),)
-TEST_OS = centos-8-stream
+TEST_OS = fedora-39
 endif
 export TEST_OS
 TARFILE=$(RPM_NAME)-$(VERSION).tar.xz
@@ -20,6 +20,13 @@ DIST_TEST=dist/manifest.json
 COCKPIT_REPO_STAMP=pkg/lib/cockpit-po-plugin.js
 # common arguments for tar, mostly to make the generated tarballs reproducible
 TAR_ARGS = --sort=name --mtime "@$(shell git show --no-patch --format='%at')" --mode=go=rX,u+rw,a-s --numeric-owner --owner=0 --group=0
+# default customize_flags
+VM_CUSTOMIZE_FLAGS = --no-network
+
+ifeq ($(TEST_COVERAGE),yes)
+RUN_TESTS_OPTIONS+=--coverage
+NODE_ENV=development
+endif
 
 all: $(DIST_TEST)
 
@@ -29,6 +36,8 @@ all: $(DIST_TEST)
 COCKPIT_REPO_FILES = \
 	pkg/lib \
 	test/common \
+	test/static-code \
+	tools/node-modules \
 	$(NULL)
 
 COCKPIT_REPO_URL = https://github.com/cockpit-project/cockpit.git
@@ -74,22 +83,26 @@ po/LINGUAS:
 #
 # Build/Install/dist
 #
-
 $(SPEC): packaging/$(SPEC).in $(NODE_MODULES_TEST)
 	provides=$$(npm ls --omit dev --package-lock-only --depth=Infinity | grep -Eo '[^[:space:]]+@[^[:space:]]+' | sort -u | sed 's/^/Provides: bundled(npm(/; s/\(.*\)@/\1)) = /'); \
 	awk -v p="$$provides" '{gsub(/%{VERSION}/, "$(VERSION)"); gsub(/%{NPM_PROVIDES}/, p)}1' $< > $@
 
-$(DIST_TEST): $(NODE_MODULES_TEST) $(COCKPIT_REPO_STAMP) $(shell find src/ -type f) package.json build.js
-	NODE_ENV=$(NODE_ENV) ./build.js
+packaging/arch/PKGBUILD: packaging/arch/PKGBUILD.in
+	sed 's/VERSION/$(VERSION)/; s/SOURCE/$(TARFILE)/' $< > $@
 
-watch: $(NODE_MODULES_TEST) $(COCKPIT_REPO_STAMP)
-	NODE_ENV=$(NODE_ENV) ./build.js --watch
+packaging/debian/changelog: packaging/debian/changelog.in
+	sed 's/VERSION/$(VERSION)/' $< > $@
+
+$(DIST_TEST): $(COCKPIT_REPO_STAMP) $(shell find src/ -type f) package.json build.js
+	$(MAKE) package-lock.json && NODE_ENV=$(NODE_ENV) ./build.js
+
+watch: $(NODE_MODULES_TEST)
+	NODE_ENV=$(NODE_ENV) ./build.js -w
 
 clean:
 	rm -rf dist/
-	rm -f $(SPEC)
+	rm -f $(SPEC) packaging/arch/PKGBUILD packaging/debian/changelog
 	rm -f po/LINGUAS
-	rm -f package-log.json
 
 install: $(DIST_TEST) po/LINGUAS
 	mkdir -p $(DESTDIR)$(PREFIX)/share/cockpit/$(PACKAGE_NAME)
@@ -114,81 +127,88 @@ devel-uninstall:
 print-version:
 	@echo "$(VERSION)"
 
+# required for running integration tests; commander and ws are deps of chrome-remote-interface
+TEST_NPMS = \
+       node_modules/chrome-remote-interface \
+       node_modules/commander \
+       node_modules/sizzle \
+       node_modules/ws \
+       $(NULL)
+
 dist: $(TARFILE)
 	@ls -1 $(TARFILE)
 
-# when building a distribution tarball, call bundler with a 'production' environment
-# we don't ship node_modules for license and compactness reasons; we ship a
-# pre-built dist/ (so it's not necessary) and ship package-lock.json (so that
-# node_modules/ can be reconstructed if necessary)
-$(TARFILE): export NODE_ENV=production
-$(TARFILE): $(DIST_TEST) $(SPEC)
+# when building a distribution tarball, call bundler with a 'production' environment by default
+# we don't ship most node_modules for license and compactness reasons, only the ones necessary for running tests
+# we ship a pre-built dist/ (so it's not necessary) and ship package-lock.json (so that node_modules/ can be reconstructed if necessary)
+$(TARFILE): export NODE_ENV ?= production
+$(TARFILE): $(DIST_TEST) $(SPEC) packaging/arch/PKGBUILD packaging/debian/changelog
 	if type appstream-util >/dev/null 2>&1; then appstream-util validate-relax --nonet *.metainfo.xml; fi
 	tar --xz $(TAR_ARGS) -cf $(TARFILE) --transform 's,^,$(RPM_NAME)/,' \
-		--exclude packaging/$(SPEC).in --exclude node_modules \
-		$$(git ls-files) $(COCKPIT_REPO_FILES) $(NODE_MODULES_TEST) $(SPEC) dist/
-
-$(NODE_CACHE): $(NODE_MODULES_TEST)
-	tar --xz $(TAR_ARGS) -cf $@ node_modules
-
-node-cache: $(NODE_CACHE)
+		--exclude '*.in' --exclude test/reference \
+		$$(git ls-files | grep -v node_modules) \
+		$(COCKPIT_REPO_FILES) $(NODE_MODULES_TEST) $(SPEC) $(TEST_NPMS) \
+		packaging/arch/PKGBUILD packaging/debian/changelog dist/
 
 # convenience target for developers
-srpm: $(TARFILE) $(NODE_CACHE) $(SPEC)
-	rpmbuild -bs \
-	  --define "_sourcedir `pwd`" \
-	  --define "_srcrpmdir `pwd`" \
-	  $(SPEC)
+rpm: $(TARFILE)
+	rpmbuild -tb --define "_topdir $(CURDIR)/tmp/rpmbuild" $(TARFILE)
+	find tmp/rpmbuild -name '*.rpm' -printf '%f\n' -exec mv {} . \;
+	rm -r tmp/rpmbuild
 
-# convenience target for developers
-rpm: $(TARFILE) $(NODE_CACHE) $(SPEC)
-	mkdir -p "`pwd`/output"
-	mkdir -p "`pwd`/rpmbuild"
-	rpmbuild -bb \
-	  --define "_sourcedir `pwd`" \
-	  --define "_specdir `pwd`" \
-	  --define "_builddir `pwd`/rpmbuild" \
-	  --define "_srcrpmdir `pwd`" \
-	  --define "_rpmdir `pwd`/output" \
-	  --define "_buildrootdir `pwd`/build" \
-	  $(SPEC)
-	find `pwd`/output -name '*.rpm' -printf '%f\n' -exec mv {} . \;
-	rm -r "`pwd`/rpmbuild"
-	rm -r "`pwd`/output" "`pwd`/build"
+ifeq ("$(TEST_SCENARIO)","updates-testing")
+VM_CUSTOMIZE_FLAGS = --run-command 'dnf -y update --setopt=install_weak_deps=False --enablerepo=updates-testing >&2'
+endif
+
+ifeq ("$(TEST_SCENARIO)","podman-next")
+VM_CUSTOMIZE_FLAGS = --run-command 'dnf -y copr enable rhcontainerbot/podman-next >&2; dnf -y update --repo 'copr*' >&2'
+endif
 
 # build a VM with locally built distro pkgs installed
-# disable networking, VM images have mock/pbuilder with the common build dependencies pre-installed
-$(VM_IMAGE): $(TARFILE) $(NODE_CACHE) bots test/vm.install
-	bots/image-customize --no-network --fresh \
-		--upload $(NODE_CACHE):/var/tmp/ --build $(TARFILE) \
-		--script $(CURDIR)/test/vm.install $(TEST_OS)
+$(VM_IMAGE): $(TARFILE) packaging/debian/rules packaging/debian/control packaging/arch/PKGBUILD bots
+	# HACK for ostree images: skip the rpm build/install
+	if [ "$$TEST_OS" = "fedora-coreos" ] || [ "$$TEST_OS" = "rhel4edge" ]; then \
+	    bots/image-customize --verbose --fresh --no-network --run-command 'mkdir -p /usr/local/share/cockpit' \
+	                         --upload dist/:/usr/local/share/cockpit/podman \
+	                         --script $(CURDIR)/test/vm.install $(TEST_OS); \
+	else \
+	    bots/image-customize --verbose --fresh $(VM_CUSTOMIZE_FLAGS) --build $(TARFILE) \
+	                         --script $(CURDIR)/test/vm.install $(TEST_OS); \
+	fi
 
 # convenience target for the above
 vm: $(VM_IMAGE)
 	@echo $(VM_IMAGE)
 
-# convenience target to print the filename of the test image
+# convenience target to print the filename of the playground image
 print-vm:
 	@echo $(VM_IMAGE)
 
+# run static code checks for python code
+PYEXEFILES=$(shell git grep -lI '^#!.*python')
+
+codecheck: test/static-code $(NODE_MODULES_TEST)
+	test/static-code
+
 # convenience target to setup all the bits needed for the integration tests
 # without actually running them
-prepare-check: $(NODE_MODULES_TEST) $(VM_IMAGE) test/common
+prepare-check: $(NODE_MODULES_TEST) $(VM_IMAGE) test/common test/reference
 
-# run the browser integration tests
+# run the browser integration tests; skip check for SELinux denials
 # this will run all tests/check-* and format them as TAP
 check: prepare-check
-	test/common/run-tests ${RUN_TESTS_OPTIONS}
+	TEST_AUDIT_NO_SELINUX=1 test/common/run-tests ${RUN_TESTS_OPTIONS}
 
-# checkout Cockpit's bots for standard test VM images and API to launch them
 bots: $(COCKPIT_REPO_STAMP)
 	test/common/make-bots
 
-$(NODE_MODULES_TEST): package.json
-	# if it exists already, npm install won't update it; force that so that we always get up-to-date packages
-	rm -f package-lock.json
-	# unset NODE_ENV, skips devDependencies otherwise
-	env -u NODE_ENV npm install --ignore-scripts
-	env -u NODE_ENV npm prune
+test/reference: test/common
+	test/common/pixel-tests pull
 
-.PHONY: all clean install devel-install devel-uninstall print-version dist node-cache rpm prepare-check check vm print-vm
+# We want tools/node-modules to run every time package-lock.json is requested
+# See https://www.gnu.org/software/make/manual/html_node/Force-Targets.html
+FORCE:
+$(NODE_MODULES_TEST): FORCE tools/node-modules
+	tools/node-modules make_package_lock_json
+
+.PHONY: all clean install devel-install devel-uninstall print-version dist rpm prepare-check check vm print-vm

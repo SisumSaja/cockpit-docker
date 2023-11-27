@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eux
 
-# tests need cockpit's bots/ libraries and test infrastructure
+# tests need cockpit's bots/ libraries and playground infrastructure
 cd $SOURCE
 git init
 rm -f bots  # common local case: existing bots symlink
@@ -38,5 +38,5 @@ test/common/run-tests --nondestructive --machine 127.0.0.1:22 --browser 127.0.0.
 
 echo $RC > "$LOGS/exitcode"
 cp --verbose Test* "$LOGS" || true
-# deliver test result via exitcode file
+# deliver playground result via exitcode file
 exit 0
