@@ -37,7 +37,6 @@ all: $(DIST_TEST)
 COCKPIT_REPO_FILES = \
 	pkg/lib \
 	test/common \
-<<<<<<< HEAD
 	test/static-code \
 	tools/node-modules \
 	$(NULL)
